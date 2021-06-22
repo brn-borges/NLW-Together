@@ -22,7 +22,14 @@ class User {
   @UpdateDateColumn()
   update_at: Date;
 
+   constructor(){
+     if(!this.id){
+       this.id = uuid();
+     }
+   }
+
 };
+
 export { User };
 
 //Entitdade <-> ORM <-> BD (users)
