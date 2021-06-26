@@ -1,44 +1,50 @@
-import { getCustomRepository } from "typeorm"
-import { compare } from "bcryptjs"
-import { sign } from "jsonwebtoken"
-import { UserRepositories } from "../repositories/UsersRepositories"
+import { getCustomRepository } from "typeorm";
+import { compare } from "bcryptjs";
+import { sign } from "jsonwebtoken";
 
+import { UsersRepositories } from "../repositories/UsersRepositories";
 
-interface IAuthenticateRequest{
+interface IAuthenticateRequest {
   email: string;
   password: string;
 }
 
 class AuthenticateUserService {
+  async execute({ email, password }: IAuthenticateRequest) {
+    const usersRepositories = getCustomRepository(UsersRepositories);
 
-  async execute({email, password}: IAuthenticateRequest){
-    const usersRepositories = getCustomRepository(UserRepositories)
     // Verificar se email existe
     const user = await usersRepositories.findOne({
-      email
+      email,
     });
 
-    if(!user){
-      throw new Error("Email/Password incorrect")
+    if (!user) {
+      throw new Error("Email/Password incorrect");
     }
-    // Verificar se senha está correta
 
-    //12345 / sdf5dsf45sd4f5sd4f5
-    const passwordMatch = await compare(password, user.password)
+    // verificar se senha está correta
 
-    if(!passwordMatch){
-      throw new Error("Email/Password incorrect")
+    // 123456 / 783645734-sdhfhsdf7762374234234
+    const passwordMatch = await compare(password, user.password);
+
+    if (!passwordMatch) {
+      throw new Error("Email/Password incorrect");
     }
+
     // Gerar token
-    const token = sign({
-      email: user.email
-    }, "7fd78191f8532f2a5a1253a72ef27506", {
-      subject: user.id, 
-      expiresIn: "1d"
-    }
+    const token = sign(
+      {
+        email: user.email,
+      },
+      "4f93ac9d10cb751b8c9c646bc9dbccb9",
+      {
+        subject: user.id,
+        expiresIn: "1d",
+      }
     );
+
     return token;
   }
 }
 
-export { AuthenticateUserService }
+export { AuthenticateUserService };
